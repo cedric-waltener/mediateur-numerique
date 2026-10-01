@@ -1,0 +1,78 @@
+rules_version = '2';
+
+// Regles de securite Firestore du site Ateliers Mediation Numerique.
+// A coller dans la console Firebase > Firestore Database > Regles, puis "Publier".
+// Ce fichier n'est pas applique automatiquement : c'est la copie de reference.
+//
+// Modele de donnees (voir auth.js) :
+//   users/{uid}                    profil, favoris, compteurs de quiz demarres
+//   users/{uid}/quizResults/{id}   un document par quiz termine
+//
+// Principe : chaque visiteur (anonyme ou inscrit) ne lit et n'ecrit QUE ses
+// propres documents ; seul le moderateur peut lister et supprimer ceux des autres.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Meme adresse que MODERATOR_EMAIL dans auth.js. Encore plus sur : remplacer
+    // par  request.auth.uid == "<UID du moderateur>"  (console Firebase > Authentication).
+    function isModerator() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'password'
+        && request.auth.token.email == 'waltenercedric@proton.me';
+    }
+
+    function optString(d, k, max) { return !(k in d) || (d[k] is string && d[k].size() <= max); }
+    function optBool(d, k) { return !(k in d) || d[k] is bool; }
+
+    function validProfile(d) {
+      return d.keys().hasOnly(['isAnonymous', 'email', 'isTestSession', 'firstSeen',
+                               'lastActiveDay', 'streak', 'location', 'username',
+                               'favorites', 'quizStarts'])
+        && optBool(d, 'isAnonymous')
+        && optBool(d, 'isTestSession')
+        && (!('email' in d) || d.email == request.auth.token.email)
+        && optString(d, 'username', 40)
+        && optString(d, 'firstSeen', 40)
+        && optString(d, 'lastActiveDay', 10)
+        && (!('streak' in d) || (d.streak is number && d.streak >= 0))
+        && (!('favorites' in d) || (d.favorites is list && d.favorites.size() <= 60))
+        && (!('quizStarts' in d) || (d.quizStarts is map && d.quizStarts.size() <= 200))
+        // location : ancienne localisation par IP, plus collectee. Elle peut
+        // seulement rester telle quelle (en attendant son effacement) ou disparaitre.
+        && (!('location' in d)
+              || (resource != null && d.location == resource.data.get('location', null)));
+    }
+
+    function validResult(d) {
+      return d.keys().hasOnly(['slug', 'level', 'score', 'total', 'pct', 'wrongQuestions', 'date'])
+        && d.keys().hasAll(['slug', 'level', 'score', 'total', 'pct', 'date'])
+        && d.slug is string && d.slug.matches('^[a-z0-9-]{1,40}$')
+        && d.level in ['debutant', 'intermediaire', 'avance']
+        && d.score is int && d.total is int && d.pct is int
+        && d.total > 0 && d.total <= 100
+        && d.score >= 0 && d.score <= d.total
+        && d.pct >= 0 && d.pct <= 100
+        && d.date is string && d.date.size() <= 40
+        && (!('wrongQuestions' in d) || (d.wrongQuestions is list && d.wrongQuestions.size() <= 100));
+    }
+
+    match /users/{uid} {
+      allow get: if isOwner(uid) || isModerator();
+      allow list: if isModerator();
+      allow create, update: if isOwner(uid) && validProfile(request.resource.data);
+      allow delete: if isOwner(uid) || isModerator();
+
+      match /quizResults/{resultId} {
+        allow read: if isOwner(uid) || isModerator();
+        allow create: if isOwner(uid) && validResult(request.resource.data);
+        allow update: if false;
+        allow delete: if isOwner(uid) || isModerator();
+      }
+    }
+
+    // Tout le reste est refuse par defaut.
+  }
+}

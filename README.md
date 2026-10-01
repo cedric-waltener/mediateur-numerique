@@ -19,6 +19,7 @@ stats.html            Tableau de bord des visites de quiz
 404.html               Page d'erreur personnalisée
 style.css                Feuille de style partagée (voir "Système de design")
 manifest.json              Manifeste PWA (site installable)
+firestore.rules            Règles de sécurité Firebase (copie de référence, voir "Sécurité")
 ateliers/                    Une page HTML par fiche et par quiz
   <slug>_<fiche>.html          Ex. smartphone_fiche-exercice.html
   <slug>_quiz.html              Quiz à 3 niveaux, traduit
@@ -134,6 +135,37 @@ revenir en arrière sur cette migration.
   publié.
 - **Pied de page** harmonisé sur l'accueil et `stats.html` (liens GitHub,
   À propos, Prestations, Statistiques/Accueil).
+
+## Sécurité
+
+La vérification "modérateur" faite dans les pages (`isModerator` dans
+`auth.js`) ne sert qu'à l'affichage : la vraie protection des données est
+assurée par les **règles Firestore**, côté serveur. Leur copie de référence
+est `firestore.rules` ; elle n'est pas appliquée automatiquement, il faut la
+coller dans la console Firebase (Firestore Database > Règles > Publier) après
+chaque modification. Si un nouveau champ est enregistré dans `users/{uid}` ou
+`quizResults`, l'ajouter aussi dans `validProfile` / `validResult`, sinon
+l'écriture sera refusée.
+
+Toute donnée venant de Firestore (nom d'utilisateur, favoris, résultats de
+quiz…) peut avoir été modifiée par le visiteur lui-même : elle doit passer par
+`escapeHtml()` avant d'être insérée avec `innerHTML`.
+
+Chaque page déclare une **politique de sécurité du contenu** (balise
+`<meta http-equiv="Content-Security-Policy">`, identique partout) : seuls les
+services listés peuvent être contactés (Firebase, Google Fonts, Google
+Traduction, compteur abacus, QR codes, FormSubmit). Pour ajouter un nouveau
+service externe (script, image, API…), il faut ajouter son adresse dans cette
+balise sur toutes les pages, sinon le navigateur le bloque.
+
+`compte.html`, `moderateur.html` et `inscription.html` refusent de s'afficher
+dans un cadre d'un autre site (protection anti-clickjacking, en tête de page).
+Le tableau de bord modérateur ne charge volontairement pas Google Traduction :
+aucun script extérieur sur la page qui voit toutes les données.
+
+La localisation des visiteurs par adresse IP (ipapi.co) a été supprimée pour
+respecter le RGPD ; les anciennes villes enregistrées sont effacées
+automatiquement au retour de chaque visiteur (`auth.js`).
 
 ## Licence
 

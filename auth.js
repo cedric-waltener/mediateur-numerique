@@ -9,7 +9,7 @@ import {
 import {
   getFirestore, doc, getDoc, setDoc, deleteDoc,
   arrayUnion, arrayRemove, collection, addDoc,
-  query, orderBy, getDocs, increment
+  query, orderBy, getDocs, increment, deleteField
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -41,7 +41,9 @@ export function watchAuth(cb) {
   return onAuthStateChanged(auth, function (user) {
     if (user) {
       const ref = doc(db, "users", user.uid);
-      const data = { isAnonymous: !!user.isAnonymous };
+      // location : ancienne localisation par IP (ipapi.co), abandonnee pour le RGPD.
+      // On l'efface du profil a chaque visite, jusqu'a ce qu'il n'en reste plus.
+      const data = { isAnonymous: !!user.isAnonymous, location: deleteField() };
       if (user.email) data.email = user.email;
       if (isTestSession()) data.isTestSession = true;
       if (user.isAnonymous) {
@@ -51,7 +53,6 @@ export function watchAuth(cb) {
         }).catch(function () {
           return setDoc(ref, data, { merge: true }).catch(function () {});
         });
-        if (!data.isTestSession) { ensureLocationInfo(user.uid).catch(function () {}); }
         cb(user);
       } else {
         getDoc(ref).then(function (snap) {
@@ -78,23 +79,6 @@ export function watchAuth(cb) {
       cb(user);
     }
   });
-}
-
-export async function ensureLocationInfo(uid) {
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
-  if (snap.exists() && snap.data().location) return;
-  const resp = await fetch('https://ipapi.co/json/');
-  if (!resp.ok) return;
-  const geo = await resp.json();
-  if (geo.error) return;
-  await setDoc(ref, {
-    location: {
-      city: geo.city || '',
-      region: geo.region || '',
-      country: geo.country_name || ''
-    }
-  }, { merge: true });
 }
 
 export function login(email, password) { return signInWithEmailAndPassword(auth, email, password); }
@@ -176,7 +160,6 @@ export async function getAllUsersWithData() {
       isAnonymous: !!data.isAnonymous || !data.email,
       isTestSession: !!data.isTestSession,
       firstSeen: data.firstSeen || null,
-      location: data.location || null,
       quizStarts: data.quizStarts || {},
       favorites: data.favorites || [],
       history: history
@@ -190,7 +173,8 @@ function authErrorMessage(err) {
   const map = {
     'auth/email-already-in-use': 'Cette adresse e-mail est déjà utilisée.',
     'auth/invalid-email': 'Adresse e-mail invalide.',
-    'auth/weak-password': 'Le mot de passe doit faire au moins 6 caractères.',
+    'auth/weak-password': 'Le mot de passe doit faire au moins 8 caractères.',
+    'auth/password-does-not-meet-requirements': 'Mot de passe trop faible : 8 caractères minimum.',
     'auth/user-not-found': 'Aucun compte avec cette adresse e-mail.',
     'auth/wrong-password': 'Mot de passe incorrect.',
     'auth/invalid-credential': 'E-mail ou mot de passe incorrect.',
