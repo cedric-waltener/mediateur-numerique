@@ -16,12 +16,12 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
 
-    // Meme adresse que MODERATOR_EMAIL dans auth.js. Encore plus sur : remplacer
-    // par  request.auth.uid == "<UID du moderateur>"  (console Firebase > Authentication).
+    // Le moderateur est reconnu par son identifiant de compte (meme valeur que
+    // MODERATOR_UID dans auth.js), impossible a usurper contrairement a une adresse e-mail.
     function isModerator() {
       return signedIn()
         && request.auth.token.firebase.sign_in_provider == 'password'
-        && request.auth.token.email == 'waltenercedric@proton.me';
+        && request.auth.uid == 'foo9DdCIKvh1iLKeVBHSAtjcq442';
     }
 
     function optString(d, k, max) { return !(k in d) || (d[k] is string && d[k].size() <= max); }

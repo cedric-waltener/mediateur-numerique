@@ -26,8 +26,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export const MODERATOR_EMAIL = "waltenercedric@proton.me";
-export function isModerator(user) { return !!user && user.email === MODERATOR_EMAIL; }
+// Le moderateur est reconnu par son identifiant de compte Firebase (UID), pas par son
+// adresse e-mail (publique) : meme verification que dans firestore.rules.
+export const MODERATOR_UID = "foo9DdCIKvh1iLKeVBHSAtjcq442";
+export function isModerator(user) { return !!user && !user.isAnonymous && user.uid === MODERATOR_UID; }
 
 // Marqueur de session de test : toute page chargee avec ?internal_test=1 dans
 // l'URL est taguee isTestSession=true sur son profil, et n'incremente pas les
@@ -170,7 +172,7 @@ export async function getAllUsersWithData() {
   const results = [];
   for (const userDoc of usersSnap.docs) {
     const data = userDoc.data();
-    if (data.email === MODERATOR_EMAIL) continue;
+    if (userDoc.id === MODERATOR_UID) continue;
     let history = [];
     try {
       const q = query(collection(db, "users", userDoc.id, "quizResults"), orderBy("date", "desc"));
