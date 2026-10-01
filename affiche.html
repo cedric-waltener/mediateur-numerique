@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affiche à imprimer — Ateliers Médiation Numérique</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* Affiche A4 a imprimer et a deposer en mairie, mediatheque, France Services, commerces... */
+  :root { --green: #35604f; --green-soft: #e6eee9; --blue: #00aaff; --ink: #1f2a26; --muted: #5b6662; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #d9dcd8; color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+  .toolbar { text-align: center; padding: 16px; }
+  .toolbar button { font: 600 1.05rem 'Inter', sans-serif; padding: 0.7rem 1.4rem; border: 0; border-radius: 999px; background: var(--green); color: #fff; cursor: pointer; }
+  .toolbar p { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  .sheet { width: 210mm; height: 297mm; margin: 0 auto 24px; background: #fff; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+  .top { background: var(--green); color: #fff; padding: 9mm 14mm 8mm; }
+  .brand { display: flex; align-items: center; gap: 4mm; font-weight: 600; font-size: 11pt; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.92; }
+  .brand img { width: 11mm; height: 11mm; border-radius: 50%; background: #fff; }
+  h1 { font-family: 'Fraunces', Georgia, serif; font-size: 38pt; line-height: 1.08; margin: 5mm 0 2mm; }
+  .lead { font-size: 15pt; margin: 0; }
+  .body { padding: 8mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 6mm; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4.6mm; }
+  li { font-size: 16.5pt; display: flex; gap: 4mm; align-items: baseline; }
+  li span { font-size: 19pt; width: 10mm; flex: none; text-align: center; }
+  .places { border: 1mm solid var(--blue); border-radius: 5mm; padding: 4mm 6mm; text-align: center; }
+  .places strong { display: block; font-family: 'Fraunces', Georgia, serif; font-size: 23pt; color: var(--green); }
+  .places small { font-size: 12pt; color: var(--muted); }
+  .contact { display: flex; gap: 7mm; align-items: center; background: var(--green-soft); border-radius: 5mm; padding: 5mm 6mm; }
+  .contact img { width: 46mm; height: 46mm; image-rendering: pixelated; background: #fff; padding: 2mm; border-radius: 2mm; flex: none; }
+  .contact p { margin: 0 0 2mm; font-size: 12.5pt; }
+  .contact .cta { font-weight: 700; font-size: 17pt; color: var(--green); }
+  .contact .url { font-weight: 600; word-break: break-all; }
+  .strips { display: grid; grid-template-columns: repeat(8, 1fr); border-top: 0.4mm dashed #999; margin-top: 6mm; height: 46mm; }
+  .strip { border-left: 0.4mm dashed #999; display: flex; align-items: center; justify-content: center; padding: 2mm 0; }
+  .strip:first-child { border-left: 0; }
+  .strip div { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 8.5pt; line-height: 1.25; text-align: center; }
+  .strip b { color: var(--green); }
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .sheet { margin: 0; box-shadow: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media screen and (max-width: 840px) {
+    .sheet { zoom: 0.45; }
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="printBtn">🖨️ Imprimer l'affiche</button>
+  <p>Format A4. Découpez les petites bandes du bas pour que les gens emportent le contact.</p>
+</div>
+
+<div class="sheet">
+  <div class="top">
+    <div class="brand"><img src="logo.png" alt="">Ateliers Médiation Numérique</div>
+    <h1>Le numérique vous complique la vie&nbsp;?</h1>
+    <p class="lead">Je vous aide pas à pas, à votre rythme. Débutants et seniors bienvenus.</p>
+  </div>
+
+  <div class="body">
+    <ul>
+      <li><span>📱</span>Utiliser son smartphone, sa tablette ou son ordinateur</li>
+      <li><span>🛡️</span>Repérer les arnaques par SMS, e-mail et téléphone</li>
+      <li><span>🏛️</span>CAF, impôts, Ameli, retraite, carte d'identité en ligne</li>
+      <li><span>💼</span>Faire son CV, trouver une formation</li>
+      <li><span>👨‍👧</span>Protéger ses enfants sur Internet</li>
+      <li><span>🛠️</span>PC ou téléphone en panne&nbsp;: diagnostic et réparation</li>
+    </ul>
+
+    <div class="places">
+      <small>Ateliers en groupe ou accompagnement individuel</small>
+      <strong>📍 La Souterraine · Guéret · Saint-Vaury</strong>
+    </div>
+
+    <div class="contact">
+      <img src="img/qr/index.png" alt="QR code vers le site" width="160" height="160">
+      <div>
+        <p class="cta">Scannez pour découvrir les ateliers et vous inscrire</p>
+        <p class="url">titi20061982-png.github.io/mediateur-numerique</p>
+        <p>Cédric Waltener, médiateur numérique<br>✉️ waltenercedric@proton.me</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strips">
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+    <div class="strip"><div><b>Ateliers numériques</b><br>waltenercedric@proton.me</div></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+</script>
+</body>
+</html>

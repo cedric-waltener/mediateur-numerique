@@ -188,6 +188,26 @@ automatiquement au retour de chaque visiteur (`auth.js`).
   tableau de bord applique les deux premières ; les fiches d'inscription se
   trient à la main dans la messagerie.
 
+## Se faire connaître (visites et inscriptions)
+
+- **Inscription ouverte à tous** (`inscription.html`) : plus besoin de compte ni
+  de 50 % au test. Le test reste conseillé ; si le visiteur l'a déjà passé, son
+  meilleur score est joint à la demande (« Score au test »). Champs ajoutés :
+  téléphone (facultatif) et lieu souhaité — tout nouveau champ doit aussi être
+  listé dans `mentions-legales.html`.
+- **Recherches locales** : les titres, descriptions et bandeaux 📍 des pages
+  principales citent les lieux des ateliers (La Souterraine, Guéret,
+  Saint-Vaury). Si les lieux changent, mettre à jour : `index.html` (titre,
+  description, bandeau, bloc JSON-LD, section À propos), `inscription.html`
+  (titre, description, bandeau, liste « Lieu souhaité »), `prestations.html`,
+  `prestations-adrn.html`, `a-propos.html` et `affiche.html`.
+- Chaque page publique déclare son adresse officielle (`<link rel="canonical">`) ;
+  `compte.html`, `moderateur.html` et `404.html` sont exclues des moteurs de
+  recherche (`noindex`). Une nouvelle page publique doit avoir sa balise
+  canonical et être ajoutée à `sitemap.xml`.
+- `affiche.html` : affiche A4 à imprimer (non liée dans le menu), avec QR code
+  et languettes à détacher, pour les mairies, médiathèques, France Services…
+
 ## Licence
 
 Voir [LICENSE](./LICENSE) : toute réutilisation du contenu nécessite une

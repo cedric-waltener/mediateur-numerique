@@ -7,14 +7,12 @@
     <priority>1.0</priority>
   </url>
 
-  <url><loc>https://titi20061982-png.github.io/mediateur-numerique/index.html</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/a-propos.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/prestations.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/mentions-legales.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/prestations-adrn.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/inscription.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/stats.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://titi20061982-png.github.io/mediateur-numerique/compte.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/enfants.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 
   <url><loc>https://titi20061982-png.github.io/mediateur-numerique/ateliers/smartphone_quiz.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>

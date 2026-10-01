@@ -4,7 +4,7 @@
 // arriere-plan des que le reseau repond. Rien n'est precharge a l'avance --
 // seules les pages reellement visitees deviennent disponibles hors ligne.
 // Augmenter CACHE_NAME force un nettoyage complet du cache existant.
-const CACHE_NAME = 'mediation-numerique-v2';
+const CACHE_NAME = 'mediation-numerique-v3';
 
 self.addEventListener('install', function (event) {
   self.skipWaiting();

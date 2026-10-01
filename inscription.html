@@ -16,16 +16,17 @@
   })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscription aux ateliers de médiation numérique — Cédric Waltener</title>
-<meta name="description" content="Inscrivez-vous à un atelier ou un accompagnement individuel de médiation numérique en présentiel avec Cédric Waltener : indiquez vos coordonnées, l'atelier souhaité et votre message.">
+<title>Inscription aux ateliers numériques — Guéret, La Souterraine, Saint-Vaury</title>
+<link rel="canonical" href="https://titi20061982-png.github.io/mediateur-numerique/inscription.html">
+<meta name="description" content="Inscrivez-vous à un atelier numérique ou un accompagnement individuel à Guéret, La Souterraine ou Saint-Vaury (Creuse) avec Cédric Waltener, médiateur numérique. Sans compte, en 2 minutes.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://titi20061982-png.github.io/mediateur-numerique/inscription.html">
 <meta property="og:title" content="Inscription aux ateliers de médiation numérique — Cédric Waltener">
-<meta property="og:description" content="Inscrivez-vous à un atelier ou un accompagnement individuel de médiation numérique en présentiel avec Cédric Waltener : indiquez vos coordonnées, l'atelier souhaité et votre message.">
+<meta property="og:description" content="Inscrivez-vous à un atelier numérique ou un accompagnement individuel à Guéret, La Souterraine ou Saint-Vaury (Creuse) avec Cédric Waltener, médiateur numérique. Sans compte, en 2 minutes.">
 <meta property="og:image" content="https://titi20061982-png.github.io/mediateur-numerique/logo.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Inscription aux ateliers de médiation numérique — Cédric Waltener">
-<meta name="twitter:description" content="Inscrivez-vous à un atelier ou un accompagnement individuel de médiation numérique en présentiel avec Cédric Waltener : indiquez vos coordonnées, l'atelier souhaité et votre message.">
+<meta name="twitter:description" content="Inscrivez-vous à un atelier numérique ou un accompagnement individuel à Guéret, La Souterraine ou Saint-Vaury (Creuse) avec Cédric Waltener, médiateur numérique. Sans compte, en 2 minutes.">
 <meta name="twitter:image" content="https://titi20061982-png.github.io/mediateur-numerique/logo.png">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
@@ -45,7 +46,7 @@
     <div class="eyebrow">📝 Inscription</div>
     <h1>S'inscrire à un cours de médiation numérique</h1>
     <p class="sub">Vous souhaitez participer à un atelier collectif ou bénéficier d'un accompagnement individuel <strong>en présentiel avec moi</strong> ? Remplissez ce formulaire pour vous inscrire : je vous recontacterai pour organiser la séance.</p>
-    <p class="sub">⚠️ Pour vous inscrire, vous devez être connecté et avoir obtenu au moins <strong>50 %</strong> au test de connaissances de l'atelier concerné.</p>
+    <p class="sub">📍 Ateliers à <strong>La Souterraine</strong>, <strong>Guéret</strong> et <strong>Saint-Vaury</strong> (Creuse). Pas besoin de compte : remplissez simplement le formulaire ci-dessous.</p>
     <nav class="toplinks">
       <a href="index.html">🏠 Accueil</a>
       <a href="a-propos.html">🌳 À propos</a>
@@ -65,13 +66,7 @@
 </header>
 
 <main class="narrow">
-  <div class="card reveal" id="authGateCard">
-    <p id="authGateText">⏳ Vérification de votre connexion…</p>
-    <div class="actions" id="authGateActions" style="display:none;">
-      <a class="acct-badge" href="compte.html" style="position:static;">👤 Se connecter / créer un compte</a>
-    </div>
-  </div>
-  <div class="card reveal" id="formCard" style="display:none;">
+  <div class="card reveal" id="formCard">
     <form class="reg-form" id="regForm">
       <div class="reg-field">
         <label for="regNom">Nom <span class="req">*</span></label>
@@ -84,6 +79,20 @@
       <div class="reg-field">
         <label for="regEmail">Adresse e-mail <span class="req">*</span></label>
         <input type="email" id="regEmail" name="email" required autocomplete="email">
+      </div>
+      <div class="reg-field">
+        <label for="regTel">Téléphone (facultatif)</label>
+        <input type="tel" id="regTel" name="telephone" autocomplete="tel" placeholder="Si vous préférez être rappelé">
+      </div>
+      <div class="reg-field">
+        <label for="regLieu">Lieu souhaité <span class="req">*</span></label>
+        <select id="regLieu" name="lieu" required>
+          <option value="" disabled selected>— Choisir un lieu —</option>
+          <option value="La Souterraine">La Souterraine</option>
+          <option value="Guéret">Guéret</option>
+          <option value="Saint-Vaury">Saint-Vaury</option>
+          <option value="Peu importe">Peu importe</option>
+        </select>
       </div>
       <div class="reg-field">
         <label for="regAtelier">Atelier souhaité <span class="req">*</span></label>
@@ -119,7 +128,7 @@
           </optgroup>
           <option value="autre">Je ne sais pas encore / autre demande</option>
         </select>
-        <p class="reg-error" id="quizGate">Vous devez d'abord réussir le test de connaissances de cet atelier (50 % minimum) avant de pouvoir vous inscrire. <a href="#" id="quizGateLink">Faire le test maintenant →</a></p>
+        <p class="reg-hint" id="quizTip" hidden></p>
       </div>
       <div class="reg-field">
         <label for="regNiveau">Niveau actuel <span class="req">*</span></label>
@@ -227,8 +236,13 @@
     var nom = document.getElementById('regNom').value.trim();
     var prenom = document.getElementById('regPrenom').value.trim();
     var email = document.getElementById('regEmail').value.trim();
+    var tel = document.getElementById('regTel').value.trim();
+    var lieu = document.getElementById('regLieu').value;
     var atelierSelect = document.getElementById('regAtelier');
     var atelierLabel = atelierSelect.options[atelierSelect.selectedIndex].text;
+    // Meilleur score au test de l'atelier choisi, rempli par le script du bas si le visiteur en a deja passe un.
+    var best = (window.__quizBest || {})[atelierSelect.value];
+    var scoreLabel = typeof best === 'number' ? best + ' %' : 'test non passé';
     var niveauSelect = document.getElementById('regNiveau');
     var niveauLabel = niveauSelect.options[niveauSelect.selectedIndex].text;
     var message = document.getElementById('regMessage').value.trim();
@@ -249,8 +263,11 @@
         Nom: nom,
         Prénom: prenom,
         'E-mail': email,
+        'Téléphone': tel || '(non indiqué)',
+        'Lieu souhaité': lieu,
         'Atelier souhaité': atelierLabel,
         'Niveau actuel': niveauLabel,
+        'Score au test': scoreLabel,
         Message: message || '(aucun message)'
       })
     })
@@ -270,76 +287,45 @@
 </script>
 
 <script type="module">
-  import { watchAuth, getQuizHistory, isModerator } from './auth.js';
+  import { watchAuth, getQuizHistory } from './auth.js';
 
-  const MIN_SCORE_PCT = 50;
-  const authGateCard = document.getElementById('authGateCard');
-  const authGateText = document.getElementById('authGateText');
-  const authGateActions = document.getElementById('authGateActions');
-  const formCard = document.getElementById('formCard');
+  // Plus aucune condition pour s'inscrire : le test reste un simple conseil, et si le
+  // visiteur en a deja passe un, son meilleur score est joint a la demande.
   const atelierSelect = document.getElementById('regAtelier');
-  const quizGate = document.getElementById('quizGate');
-  const submitBtn = document.getElementById('regSubmitBtn');
+  const emailInput = document.getElementById('regEmail');
+  const quizTip = document.getElementById('quizTip');
+  window.__quizBest = {};
 
-  let passedSlugs = null;
-
-  function bestScorePct(history, slug) {
-    let best = 0;
-    history.forEach(function (r) {
-      if (r.slug === slug && typeof r.pct === 'number' && r.pct > best) best = r.pct;
-    });
-    return best;
-  }
-
-  function checkGate() {
+  function updateTip() {
     const slug = atelierSelect.value;
-    if (!slug || slug === 'autre' || !passedSlugs) {
-      quizGate.classList.remove('show');
-      submitBtn.disabled = false;
-      return;
-    }
-    if (passedSlugs.indexOf(slug) === -1) {
-      quizGate.classList.add('show');
-      document.getElementById('quizGateLink').href = 'ateliers/' + slug + '_quiz.html';
-      submitBtn.disabled = true;
+    if (!slug || slug === 'autre') { quizTip.hidden = true; return; }
+    const best = window.__quizBest[slug];
+    quizTip.textContent = '';
+    if (typeof best === 'number') {
+      quizTip.textContent = '✅ Votre meilleur score au test de cet atelier : ' + best + ' %. Il sera joint à votre demande.';
     } else {
-      quizGate.classList.remove('show');
-      submitBtn.disabled = false;
+      const link = document.createElement('a');
+      link.href = 'ateliers/' + slug + '_quiz.html';
+      link.textContent = 'faire le test de cet atelier';
+      quizTip.append('💡 Si vous le souhaitez, vous pouvez d\'abord ', link,
+        ' (5 minutes). Ce n\'est pas obligatoire, mais cela m\'aide à préparer la séance selon votre niveau.');
     }
+    quizTip.hidden = false;
   }
 
-  atelierSelect.addEventListener('change', checkGate);
+  atelierSelect.addEventListener('change', updateTip);
 
   watchAuth(function (user) {
-    if (!user || user.isAnonymous) {
-      authGateText.textContent = '🔒 Vous devez être connecté pour vous inscrire, et avoir réussi le test de connaissances (50 % minimum) de l\'atelier concerné.';
-      authGateActions.style.display = '';
-      authGateCard.style.display = '';
-      formCard.style.display = 'none';
-      return;
-    }
-    if (isModerator(user)) {
-      authGateCard.style.display = 'none';
-      formCard.style.display = '';
-      passedSlugs = null;
-      checkGate();
-      return;
-    }
+    if (!user) return;
+    if (!user.isAnonymous && user.email && !emailInput.value) emailInput.value = user.email;
     getQuizHistory(user.uid).then(function (history) {
-      const slugs = {};
+      const best = {};
       history.forEach(function (r) {
-        if (bestScorePct(history, r.slug) >= MIN_SCORE_PCT) slugs[r.slug] = true;
+        if (typeof r.pct === 'number' && !(best[r.slug] >= r.pct)) best[r.slug] = r.pct;
       });
-      passedSlugs = Object.keys(slugs);
-      authGateCard.style.display = 'none';
-      formCard.style.display = '';
-      checkGate();
-    }).catch(function () {
-      passedSlugs = [];
-      authGateCard.style.display = 'none';
-      formCard.style.display = '';
-      checkGate();
-    });
+      window.__quizBest = best;
+      updateTip();
+    }).catch(function () {});
   });
 </script>
 <script>
