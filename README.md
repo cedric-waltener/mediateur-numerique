@@ -1,13 +1,13 @@
 # Ateliers Médiation Numérique
 
-© 2026 titi_23 — Tous droits réservés. Voir le fichier [LICENSE](./LICENSE).
+© 2026 Cédric Waltener — Tous droits réservés. Voir le fichier [LICENSE](./LICENSE).
 
 Portfolio de médiation numérique de Cédric Waltener, créé dans le cadre du
 Titre Professionnel Médiateur Numérique (AFPA Guéret) : 17 ateliers pour le
 grand public, les débutants et les seniors, chacun avec une fiche PDF et un
 quiz interactif à 3 niveaux.
 
-Site en ligne : https://titi20061982-png.github.io/mediateur-numerique/
+Site en ligne : https://cedric-waltener.github.io/mediateur-numerique/
 
 ## Structure du dépôt
 
