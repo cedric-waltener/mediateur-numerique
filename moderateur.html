@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://api.qrserver.com https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <style id="antiClickjack">body{display:none !important;}</style>
 <script>
@@ -21,7 +21,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#35604f">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -203,6 +203,7 @@
           <button type="button" class="secondary" id="exportPdfBtn">📄 Exporter en PDF</button>
           <button type="button" class="secondary" id="purgeTestBtn">🧹 Supprimer les sessions de test</button>
           <button type="button" class="secondary" id="purgeAnonTodayBtn">🧹 Supprimer les visiteurs anonymes d'aujourd'hui</button>
+          <button type="button" class="secondary" id="purgeExpiredBtn" title="Durées annoncées dans les mentions légales : 13 mois sans visite pour un visiteur anonyme, 3 ans sans connexion pour un compte">🗓️ Effacer les données expirées (RGPD)</button>
         </div>
         <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">
           <input type="checkbox" id="includeAnonToggle"> Inclure les visiteurs anonymes (🕶️) dans cette liste
@@ -218,6 +219,7 @@
     <a href="index.html">🏠 Accueil</a>
   </div>
   © 2026 titi_23 — Tous droits réservés. Voir la <a href="LICENSE">licence</a>.
+  <div style="margin-top:0.4rem;font-size:0.85em;"><a href="mentions-legales.html">Mentions légales et confidentialité</a></div>
 </footer>
 
 <script type="module">
@@ -518,6 +520,8 @@
       renderRecentActivity(realUsers);
       renderMatrix(namedUsers);
       applyFilters();
+      const expiredCount = expiredUsers().length;
+      document.getElementById('purgeExpiredBtn').textContent = '🗓️ Effacer les données expirées (RGPD)' + (expiredCount ? ' — ' + expiredCount + ' à effacer' : '');
     }).catch(function () {
       document.getElementById('usersList').innerHTML = '<p class="acct-empty">Erreur de chargement des données.</p>';
     });
@@ -704,6 +708,43 @@
     const btn = this;
     btn.disabled = true;
     Promise.all(candidates.map(function (u) { return deleteUserAccount(u.uid); }))
+      .then(loadUsers)
+      .catch(function () { alert('Erreur lors de la suppression.'); })
+      .then(function () { btn.disabled = false; });
+  });
+
+  // Durees de conservation annoncees dans mentions-legales.html.
+  const RETENTION_ANON_MS = 395 * 86400000;        // 13 mois sans visite
+  const RETENTION_ACCOUNT_MS = 3 * 365 * 86400000; // 3 ans sans connexion
+  // Avant le 01/10/2026, la derniere visite n'etait pas toujours enregistree : on compte au plus tot de cette date.
+  const ACTIVITY_TRACKING_START = new Date('2026-10-01').getTime();
+  function lastActivity(u) {
+    const dayTime = u.lastActiveDay ? new Date(u.lastActiveDay).getTime() : 0;
+    const seenTime = u.firstSeen ? new Date(u.firstSeen).getTime() : 0;
+    return Math.max(mostRecent(u.history), dayTime || 0, seenTime || 0, ACTIVITY_TRACKING_START);
+  }
+  function expiredUsers() {
+    const now = Date.now();
+    return allUsers.filter(function (u) {
+      return now - lastActivity(u) > (u.isAnonymous ? RETENTION_ANON_MS : RETENTION_ACCOUNT_MS);
+    });
+  }
+
+  document.getElementById('purgeExpiredBtn').addEventListener('click', function () {
+    const candidates = expiredUsers();
+    if (!candidates.length) { alert('Aucune donnée expirée : tout le monde a visité le site récemment.'); return; }
+    const named = candidates.filter(function (u) { return !u.isAnonymous; });
+    if (!confirm('Effacer ' + candidates.length + ' profil(s) arrivé(s) au bout de leur durée de conservation (' +
+      (candidates.length - named.length) + ' visiteur(s) anonyme(s), ' + named.length + ' compte(s) inactif(s) depuis 3 ans) ? Cette action est irréversible.')) return;
+    const btn = this;
+    btn.disabled = true;
+    Promise.all(candidates.map(function (u) { return deleteUserAccount(u.uid); }))
+      .then(function () {
+        if (named.length) {
+          alert('Données effacées. Pour finir, supprimez aussi ces comptes dans la console Firebase > Authentication :\n\n' +
+            named.map(function (u) { return u.email; }).join('\n'));
+        }
+      })
       .then(loadUsers)
       .catch(function () { alert('Erreur lors de la suppression.'); })
       .then(function () { btn.disabled = false; });

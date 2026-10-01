@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://api.qrserver.com https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <style id="antiClickjack">body{display:none !important;}</style>
 <script>
@@ -30,7 +30,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#35604f">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -105,6 +105,7 @@
         <div class="actions">
           <button type="submit" class="primary" id="registerSubmitBtn">Créer mon compte</button>
         </div>
+        <p class="reg-hint">🔒 Seuls votre e-mail, votre nom d'utilisateur, vos favoris et vos résultats de quiz sont conservés, pour suivre votre progression. Vous pourrez télécharger ou supprimer vos données à tout moment. <a href="mentions-legales.html#donnees">En savoir plus</a></p>
       </form>
 
       <div class="reg-error" id="authError"></div>
@@ -213,6 +214,28 @@
       <h3>📊 Historique de mes quiz</h3>
       <div id="historyList"><p class="acct-empty">Chargement…</p></div>
     </div>
+
+    <div class="card reveal" id="myDataCard">
+      <h3>🔐 Mes données personnelles</h3>
+      <p class="acct-empty">Vous pouvez récupérer tout ce que le site garde sur vous, ou supprimer définitivement votre compte. <a href="mentions-legales.html#donnees">Comment sont utilisées mes données ?</a></p>
+      <div class="actions">
+        <button type="button" class="secondary" id="exportDataBtn">📥 Télécharger mes données</button>
+      </div>
+      <details style="margin-top:0.8rem;">
+        <summary>🗑️ Supprimer mon compte</summary>
+        <form class="reg-form" id="deleteAccountForm" style="margin-top:0.6rem;">
+          <p class="reg-hint">Votre profil, vos favoris et tout votre historique de quiz seront effacés. Cette action est irréversible.</p>
+          <div class="reg-field">
+            <label for="deletePassword">Confirmez avec votre mot de passe</label>
+            <input type="password" id="deletePassword" required autocomplete="current-password">
+          </div>
+          <div class="actions">
+            <button type="submit" class="secondary" id="deleteAccountBtn">Supprimer définitivement mon compte</button>
+          </div>
+          <div class="reg-error" id="deleteAccountError"></div>
+        </form>
+      </details>
+    </div>
   </div>
 
 </main>
@@ -224,10 +247,11 @@
     <a href="prestations.html">💼 Prestations</a>
   </div>
   © 2026 titi_23 — Tous droits réservés. Voir la <a href="LICENSE">licence</a>.
+  <div style="margin-top:0.4rem;font-size:0.85em;"><a href="mentions-legales.html">Mentions légales et confidentialité</a></div>
 </footer>
 
 <script type="module">
-  import { watchAuth, login, register, logout, resetPassword, authErrorMessage, getCloudFavorites, getQuizHistory, isModerator, setUsername, getUserProfile } from './auth.js';
+  import { watchAuth, login, register, logout, resetPassword, authErrorMessage, getCloudFavorites, getQuizHistory, isModerator, setUsername, getUserProfile, exportMyData, deleteMyAccount } from './auth.js';
 
   const QUIZZES = [
     { slug: "battle-os", title: "Battle OS (Windows / Linux / macOS)", icon: "💻" },
@@ -341,6 +365,41 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', function () { logout(); });
+
+  document.getElementById('exportDataBtn').addEventListener('click', function () {
+    const btn = this;
+    btn.disabled = true;
+    exportMyData().then(function (data) {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mes-donnees-mediation-numerique.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }).catch(function () {
+      alert('Impossible de récupérer vos données pour le moment. Réessayez.');
+    }).finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('deleteAccountForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const errEl = document.getElementById('deleteAccountError');
+    const btn = document.getElementById('deleteAccountBtn');
+    errEl.classList.remove('show');
+    if (!confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return;
+    btn.disabled = true;
+    deleteMyAccount(document.getElementById('deletePassword').value).then(function () {
+      alert('Votre compte et vos données ont été supprimés.');
+      window.location.href = 'index.html';
+    }).catch(function (err) {
+      errEl.textContent = '❌ ' + authErrorMessage(err);
+      errEl.classList.add('show');
+      btn.disabled = false;
+    });
+  });
 
   document.getElementById('saveUsernameBtn').addEventListener('click', function () {
     const user = currentUserRef;
@@ -666,6 +725,7 @@
         document.getElementById('badgesCard').style.display = 'none';
         document.getElementById('resumeCard').style.display = 'none';
         document.getElementById('treeCard').style.display = 'none';
+        document.getElementById('myDataCard').style.display = 'none';
       }
       Promise.all([getCloudFavorites(user.uid), getQuizHistory(user.uid)]).then(function (results) {
         const favorites = results[0], history = results[1];
@@ -780,6 +840,6 @@
     );
   }
 </script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="translate-loader.js"></script>
 </body>
 </html>

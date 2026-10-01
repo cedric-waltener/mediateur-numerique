@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com; style-src 'self' 'unsafe-inline' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.gstatic.com https://www.google.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://abacus.jasoncameron.dev https://formsubmit.co https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src 'self' https://mediation-numerique-1798e.firebaseapp.com https://translate.google.com https://translate.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentions légales et confidentialité — Ateliers Médiation Numérique</title>
+<meta name="description" content="Mentions légales, politique de confidentialité (RGPD) et informations sur les cookies du site Ateliers Médiation Numérique.">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#35604f">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="scroll-progress" id="scrollProgress"></div>
+<button type="button" class="icon-btn icon-btn-floating" id="themeToggle" title="Changer de thème" aria-label="Changer de thème">🌙</button>
+<button type="button" class="icon-btn icon-btn-floating icon-btn-text" id="textSizeToggle" title="Changer la taille du texte" aria-label="Changer la taille du texte" style="right:3.9rem;">A</button>
+<button type="button" class="back-to-top" id="backToTop" title="Retour en haut" aria-label="Retour en haut">↑</button>
+
+<header>
+  <div class="wrap">
+    <a class="back" href="index.html">← Retour aux ateliers</a>
+    <div class="eyebrow">⚖️ Informations légales</div>
+    <h1>Mentions légales et confidentialité</h1>
+    <p class="sub">Qui publie ce site, où il est hébergé, et ce que deviennent vos données.</p>
+    <nav class="toplinks">
+      <a href="index.html">🏠 Accueil</a>
+      <a href="a-propos.html">🌳 À propos</a>
+      <a href="#editeur">📄 Mentions légales</a>
+      <a href="#donnees">🔒 Données personnelles</a>
+      <a href="#cookies">🍪 Cookies</a>
+      <a href="#droits">✋ Vos droits</a>
+      <a href="#translate-box">🌐 Traduire</a>
+    </nav>
+    <div class="translate-box" id="translate-box">
+      <span class="translate-label">🌐 Traduire cette page</span>
+      <div id="google_translate_element"></div>
+    </div>
+  </div>
+</header>
+
+<main class="narrow legal-page">
+
+  <section class="card reveal" id="editeur">
+    <h2>📄 Éditeur du site</h2>
+    <p>Ce site est un site personnel, édité à titre non professionnel par <strong>Cédric Waltener</strong>, dans le cadre du Titre Professionnel Médiateur Numérique (AFPA Guéret).</p>
+    <ul>
+      <li><strong>Directeur de la publication :</strong> Cédric Waltener</li>
+      <li><strong>Contact :</strong> <a href="mailto:waltenercedric@proton.me">waltenercedric@proton.me</a></li>
+    </ul>
+    <p>Conformément à l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), l'éditeur, agissant à titre non professionnel, a communiqué son adresse personnelle à l'hébergeur ci-dessous.</p>
+  </section>
+
+  <section class="card reveal" id="hebergeur">
+    <h2>🖥️ Hébergement</h2>
+    <p><strong>GitHub, Inc.</strong> (service GitHub Pages)<br>
+    88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis<br>
+    Téléphone : +1 (877) 448-4820 — <a href="https://github.com" rel="noopener">github.com</a></p>
+  </section>
+
+  <section class="card reveal" id="propriete">
+    <h2>©️ Propriété intellectuelle</h2>
+    <p>Les textes, fiches, quiz, illustrations et documents PDF de ce site sont la propriété de Cédric Waltener. Toute reproduction ou réutilisation nécessite une autorisation préalable (voir la <a href="LICENSE">licence</a>).</p>
+    <p>Les noms et logos d'organismes cités dans les ateliers (Ameli, CAF, impots.gouv, France Titres, Info Retraite…) appartiennent à leurs propriétaires. Ce site n'est affilié à aucun de ces organismes : il en explique seulement l'utilisation.</p>
+    <p>Polices de caractères : Fraunces, Inter, Baloo 2 et Quicksand, sous licence libre SIL Open Font License 1.1, hébergées directement sur ce site.</p>
+  </section>
+
+  <section class="card reveal" id="donnees">
+    <h2>🔒 Données personnelles</h2>
+    <p>Le responsable du traitement est <strong>Cédric Waltener</strong> (<a href="mailto:waltenercedric@proton.me">waltenercedric@proton.me</a>). Ce site ne collecte que le strict nécessaire, ne contient <strong>aucune publicité</strong> et <strong>ne vend ni ne partage</strong> vos données.</p>
+
+    <h3>Si vous créez un compte</h3>
+    <ul>
+      <li><strong>Données :</strong> adresse e-mail, mot de passe (enregistré chiffré par Google Firebase, jamais visible par l'éditeur), nom d'utilisateur facultatif, ateliers favoris, résultats de quiz (atelier, niveau, score, questions ratées, date), jours de connexion consécutifs.</li>
+      <li><strong>Pourquoi :</strong> vous offrir votre espace personnel et le suivi de votre progression.</li>
+      <li><strong>Base légale :</strong> l'exécution du service que vous demandez en créant un compte (article 6.1.b du RGPD).</li>
+      <li><strong>Durée :</strong> jusqu'à la suppression de votre compte (bouton dans « Mon compte »), et au plus 3 ans après votre dernière connexion.</li>
+    </ul>
+
+    <h3>Si vous utilisez le site sans compte</h3>
+    <ul>
+      <li><strong>Données :</strong> un identifiant technique anonyme créé automatiquement (aucun nom, aucune adresse e-mail), vos favoris, vos résultats de quiz, les dates de première et de dernière visite.</li>
+      <li><strong>Pourquoi :</strong> faire fonctionner les favoris et les quiz (dont la limite d'un quiz sans compte), et établir des statistiques de fréquentation internes, consultées uniquement par l'éditeur.</li>
+      <li><strong>Base légale :</strong> l'intérêt légitime de l'éditeur à faire fonctionner et améliorer ses ateliers (article 6.1.f du RGPD).</li>
+      <li><strong>Durée :</strong> 13 mois après votre dernière visite.</li>
+    </ul>
+
+    <h3>Si vous remplissez la fiche d'inscription</h3>
+    <ul>
+      <li><strong>Données :</strong> nom, prénom, adresse e-mail, atelier souhaité, niveau, message.</li>
+      <li><strong>Pourquoi :</strong> répondre à votre demande et organiser la séance.</li>
+      <li><strong>Base légale :</strong> les mesures préalables à la séance, prises à votre demande (article 6.1.b du RGPD).</li>
+      <li><strong>Durée :</strong> 3 ans après notre dernier échange.</li>
+    </ul>
+
+    <h3>Compteur de visites des quiz</h3>
+    <p>Le nombre de visites de chaque quiz est compté, sans aucun identifiant ni cookie, par le service abacus.jasoncameron.dev, qui voit passer l'adresse IP de connexion. Base légale : intérêt légitime (mesure de fréquentation).</p>
+
+    <h3>Espace enfants</h3>
+    <p>L'espace enfants (6-17 ans) fonctionne sans compte et <strong>n'enregistre aucune donnée</strong>. La création d'un compte est réservée aux personnes de 15 ans et plus, ou aux plus jeunes avec l'accord d'un parent.</p>
+
+    <h3>Qui reçoit ces données ?</h3>
+    <p>Seul l'éditeur y a accès. Elles sont stockées ou transmises par des prestataires techniques, qui agissent pour son compte :</p>
+    <ul>
+      <li><strong>Google Firebase</strong> (Google) : comptes et base de données ;</li>
+      <li><strong>FormSubmit</strong> : envoi par e-mail des fiches d'inscription ;</li>
+      <li><strong>Proton</strong> (Suisse) : messagerie de l'éditeur ;</li>
+      <li><strong>GitHub</strong> : hébergement du site (journaux techniques de connexion) ;</li>
+      <li><strong>abacus.jasoncameron.dev</strong> : compteur de visites ;</li>
+      <li><strong>Google Traduction</strong> : uniquement si vous cliquez sur « Choisir une langue ».</li>
+    </ul>
+    <p>Certains de ces prestataires sont situés hors de l'Union européenne, notamment aux États-Unis. Google et GitHub encadrent ces transferts par le cadre de protection des données UE–États-Unis (Data Privacy Framework).</p>
+
+    <h3>Sécurité</h3>
+    <p>Le site est servi uniquement en HTTPS. L'accès aux données est protégé par des règles côté serveur : chaque visiteur ne peut lire et modifier que ses propres données.</p>
+  </section>
+
+  <section class="card reveal" id="cookies">
+    <h2>🍪 Cookies et stockage dans votre navigateur</h2>
+    <p>Ce site n'utilise <strong>aucun cookie publicitaire ni de pistage</strong>. Il enregistre seulement dans votre navigateur ce qui est nécessaire à son fonctionnement, ce qui ne demande pas de consentement :</p>
+    <ul>
+      <li>le thème clair/sombre et la taille du texte choisis ;</li>
+      <li>vos ateliers favoris ;</li>
+      <li>votre session de connexion (Google Firebase) ;</li>
+      <li>une copie des pages déjà visitées, pour consulter le site hors connexion.</li>
+    </ul>
+    <p>Si vous activez Google Traduction, Google dépose un cookie « googtrans » qui retient la langue choisie.</p>
+  </section>
+
+  <section class="card reveal" id="droits">
+    <h2>✋ Vos droits</h2>
+    <p>Vous pouvez à tout moment accéder à vos données, les corriger, les effacer, en limiter l'utilisation, vous y opposer, ou les récupérer dans un format lisible (portabilité).</p>
+    <ul>
+      <li><strong>Avec un compte :</strong> la page <a href="compte.html">Mon compte</a> permet de télécharger vos données et de supprimer votre compte.</li>
+      <li><strong>Dans tous les cas :</strong> écrivez à <a href="mailto:waltenercedric@proton.me">waltenercedric@proton.me</a>. Une réponse vous sera apportée sous un mois.</li>
+    </ul>
+    <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL : <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">www.cnil.fr</a>.</p>
+    <p class="acct-empty">Dernière mise à jour : 1er octobre 2026.</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footlinks">
+    <a href="index.html">🏠 Accueil</a>
+    <a href="a-propos.html">🌳 À propos</a>
+  </div>
+  © 2026 titi_23 — Tous droits réservés. Voir la <a href="LICENSE">licence</a>.
+  <div style="margin-top:0.4rem;font-size:0.85em;"><a href="mentions-legales.html">Mentions légales et confidentialité</a></div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function sysDark() { return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+    function icon(t) { btn.textContent = (t || (sysDark() ? 'dark' : 'light')) === 'dark' ? '☀️' : '🌙'; }
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+    icon(saved);
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme') || (sysDark() ? 'dark' : 'light');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      icon(next);
+    });
+  })();
+  (function () {
+    var btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function () { btn.classList.toggle('show', window.scrollY > 400); }, { passive: true });
+    btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    var bar = document.getElementById('scrollProgress');
+    function upd() {
+      var h = document.documentElement;
+      var s = h.scrollTop || document.body.scrollTop;
+      var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+      bar.style.width = (height > 0 ? (s / height) * 100 : 0) + '%';
+    }
+    window.addEventListener('scroll', upd, { passive: true });
+    upd();
+  })();
+  (function () {
+    var targets = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      targets.forEach(function (s) { s.classList.add('in-view'); });
+      return;
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add('in-view'); obs.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -30px 0px' });
+    targets.forEach(function (s) { obs.observe(s); });
+  })();
+</script>
+<script>
+  (function () {
+    var btn = document.getElementById('textSizeToggle');
+    if (!btn) return;
+    var SIZES = [1, 1.15, 1.3];
+    var LABELS = ['A', 'A+', 'A++'];
+    var root = document.documentElement;
+    var idx = 0;
+    try {
+      var saved = parseFloat(localStorage.getItem('fontScale'));
+      var found = SIZES.indexOf(saved);
+      if (found !== -1) idx = found;
+    } catch (e) {}
+    function apply(i) {
+      idx = i;
+      root.style.setProperty('--font-scale', SIZES[idx]);
+      btn.textContent = LABELS[idx];
+      try { localStorage.setItem('fontScale', SIZES[idx]); } catch (e) {}
+    }
+    apply(idx);
+    btn.addEventListener('click', function () {
+      apply((idx + 1) % SIZES.length);
+    });
+  })();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function () {});
+    });
+  }
+</script>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      { pageLanguage: 'fr', autoDisplay: false },
+      'google_translate_element'
+    );
+  }
+</script>
+<script src="translate-loader.js"></script>
+</body>
+</html>

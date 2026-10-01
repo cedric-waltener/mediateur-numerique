@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import {
   getAuth, onAuthStateChanged, signInWithEmailAndPassword,
   createUserWithEmailAndPassword, signOut, sendPasswordResetEmail,
-  signInAnonymously
+  signInAnonymously, deleteUser, EmailAuthProvider, reauthenticateWithCredential
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc, deleteDoc,
@@ -49,6 +49,9 @@ export function watchAuth(cb) {
       if (user.isAnonymous) {
         getDoc(ref).then(function (snap) {
           if (!snap.exists() || !snap.data().firstSeen) { data.firstSeen = new Date().toISOString(); }
+          // Derniere visite : sert a effacer les visiteurs anonymes apres 13 mois sans visite
+          // (duree annoncee dans mentions-legales.html).
+          data.lastActiveDay = new Date().toISOString().slice(0, 10);
           return setDoc(ref, data, { merge: true });
         }).catch(function () {
           return setDoc(ref, data, { merge: true }).catch(function () {});
@@ -141,6 +144,27 @@ export async function deleteUserAccount(uid) {
   await deleteDoc(doc(db, "users", uid));
 }
 
+// Droit a la portabilite (RGPD art. 20) : tout ce que le site garde sur le visiteur connecte.
+export async function exportMyData() {
+  const user = auth.currentUser;
+  return {
+    exportDate: new Date().toISOString(),
+    email: user.email || null,
+    profile: await getUserProfile(user.uid),
+    quizResults: await getQuizHistory(user.uid)
+  };
+}
+
+// Droit a l'effacement (RGPD art. 17) : Firebase exige de retaper le mot de passe
+// avant de supprimer un compte, ce qui evite aussi une suppression par quelqu'un
+// d'autre sur un ordinateur reste connecte.
+export async function deleteMyAccount(password) {
+  const user = auth.currentUser;
+  await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+  await deleteUserAccount(user.uid);
+  await deleteUser(user);
+}
+
 export async function getAllUsersWithData() {
   const usersSnap = await getDocs(collection(db, "users"));
   const results = [];
@@ -160,6 +184,7 @@ export async function getAllUsersWithData() {
       isAnonymous: !!data.isAnonymous || !data.email,
       isTestSession: !!data.isTestSession,
       firstSeen: data.firstSeen || null,
+      lastActiveDay: data.lastActiveDay || null,
       quizStarts: data.quizStarts || {},
       favorites: data.favorites || [],
       history: history

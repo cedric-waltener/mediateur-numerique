@@ -167,6 +167,27 @@ La localisation des visiteurs par adresse IP (ipapi.co) a été supprimée pour
 respecter le RGPD ; les anciennes villes enregistrées sont effacées
 automatiquement au retour de chaque visiteur (`auth.js`).
 
+## Conformité (RGPD, LCEN)
+
+- `mentions-legales.html` : mentions légales (éditeur, hébergeur GitHub),
+  politique de confidentialité et cookies, liée en pied de **toutes** les
+  pages. À mettre à jour si une nouvelle donnée est collectée ou un nouveau
+  service externe ajouté (et si l'activité devient professionnelle : SIRET
+  et adresse deviennent obligatoires).
+- Aucune donnée n'est envoyée à un service extérieur sans raison :
+  polices hébergées dans `fonts/` (au lieu de Google Fonts), QR codes en
+  images fixes dans `img/qr/` et `ateliers/img/qr/` (au lieu de
+  api.qrserver.com), Google Traduction chargé seulement au clic sur
+  « Choisir une langue » (`translate-loader.js`).
+- "Mon compte" permet de télécharger ses données (JSON) et de supprimer son
+  compte (mot de passe redemandé) : `exportMyData` / `deleteMyAccount` dans
+  `auth.js`.
+- Durées de conservation annoncées : 13 mois sans visite (visiteurs
+  anonymes), 3 ans sans connexion (comptes), 3 ans (fiches d'inscription,
+  dans la boîte mail). Le bouton "🗓️ Effacer les données expirées" du
+  tableau de bord applique les deux premières ; les fiches d'inscription se
+  trient à la main dans la messagerie.
+
 ## Licence
 
 Voir [LICENSE](./LICENSE) : toute réutilisation du contenu nécessite une
