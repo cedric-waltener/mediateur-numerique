@@ -134,6 +134,8 @@
         <label for="regMessage">Message</label>
         <textarea id="regMessage" name="message" placeholder="Précisez votre demande, vos disponibilités, ou toute question…"></textarea>
       </div>
+      <!-- Piege a robots : invisible pour les visiteurs, FormSubmit ignore l'envoi s'il est rempli. -->
+      <input type="text" id="regHoney" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
       <p class="reg-hint">En validant, votre demande m'est envoyée directement — vous n'avez rien d'autre à faire.</p>
       <div class="actions">
         <button type="submit" class="primary" id="regSubmitBtn">📩 Envoyer ma demande</button>
@@ -233,13 +235,15 @@
     submitBtn.disabled = true;
     submitBtn.textContent = '⏳ Envoi en cours…';
 
-    fetch('https://formsubmit.co/ajax/waltenercedric@proton.me', {
+    // Alias FormSubmit (donne dans l'e-mail d'activation) : l'adresse e-mail n'apparait plus dans le code.
+    fetch('https://formsubmit.co/ajax/1aace840282f2dfada8285acf78d85c1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         _subject: 'Inscription atelier — ' + atelierLabel,
         _template: 'box',
         _captcha: 'false',
+        _honey: document.getElementById('regHoney').value,
         Nom: nom,
         Prénom: prenom,
         'E-mail': email,
