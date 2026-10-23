@@ -72,6 +72,7 @@
           <p><strong>Sur cette page (tableau de bord)</strong></p>
           <ul>
             <li>En haut : nombre total de comptes visiteurs, quiz passés, favoris posés, <strong>🕶️ visiteurs anonymes</strong> (personnes ayant utilisé le site sans créer de compte — suivies discrètement pour la visibilité, jamais nommées) et <strong>🧪 sessions de test</strong> (voir juste en dessous). Aucune localisation n'est collectée (supprimée pour le RGPD) : les anciennes villes enregistrées s'effacent d'elles-mêmes au retour de chaque visiteur.</li>
+            <li><strong>🟢 En direct</strong> : toute la page se met à jour toute seule dès qu'un visiteur arrive, revient, démarre ou termine un quiz — inutile d'appuyer sur F5. L'heure de la dernière mise à jour est affichée sous les chiffres du haut.</li>
             <li><strong>📈 Nouveaux visiteurs par semaine</strong> : combien de navigateurs sont venus pour la première fois sur le site chaque semaine (8 dernières semaines), et combien de visiteurs (nouveaux ou revenus, comptes inclus) sont passés ces 7 derniers jours — pratique pour voir l'effet d'un atelier, d'une affiche ou d'un article. Toutes les pages du site comptent la visite, sauf l'espace enfants (qui n'enregistre aucune donnée, comme annoncé dans les mentions légales).</li>
             <li><strong>🧪 Sessions de test</strong> : quand du developpement est fait sur le site, les pages sont parfois chargées avec <code>?internal_test=1</code> dans l'adresse — ces visites sont marquées automatiquement, exclues de toutes les statistiques ci-dessus (classement, popularité, badges, activité, KPI) et n'incrémentent pas le compteur de visites public. Elles restent visibles uniquement dans la liste "Comptes visiteurs" (cochez "Inclure les visiteurs anonymes"), clairement étiquetées "🧪 Session de test (Claude)" avec une bordure orange en pointillés — pour ne jamais les confondre avec un vrai visiteur. Le bouton <strong>"🧹 Supprimer les sessions de test"</strong> efface d'un coup tous ces comptes de test sans jamais toucher à un vrai visiteur.</li>
             <li><strong>🧹 Supprimer les visiteurs anonymes d'aujourd'hui</strong> : filet de sécurité pour les visites anonymes non marquées <code>?internal_test=1</code> (donc pas repérées par le bouton précédent) — par exemple si du développement a été fait sans ce paramètre. Supprime les comptes anonymes dont la premiere visite ou le dernier quiz date d'aujourd'hui. Les comptes anonymes trop anciens pour avoir une date connue (créés avant l'ajout de ce suivi) ne sont volontairement pas touchés, pour ne jamais risquer d'effacer un vrai visiteur par erreur.</li>
@@ -137,6 +138,8 @@
           <span class="kpi-label">Sessions de test</span>
         </div>
       </div>
+
+      <p class="acct-empty" id="liveStatus" style="margin:0.6rem 0 0;">Connexion en direct…</p>
 
       <div class="card reveal" id="weeklyCard">
         <h3>📈 Nouveaux visiteurs par semaine</h3>
@@ -232,7 +235,7 @@
 </footer>
 
 <script type="module">
-  import { watchAuth, isModerator, getAllUsersWithData, resetUserQuizHistory, deleteUserAccount, resetPassword } from './auth.js';
+  import { watchAuth, isModerator, watchAllUsersWithData, resetUserQuizHistory, deleteUserAccount, resetPassword } from './auth.js';
 
   const QUIZZES = [
     { slug: "battle-os", title: "Battle OS (Windows / Linux / macOS)", icon: "💻" },
@@ -559,27 +562,37 @@
     return latest;
   }
 
+  // Donnees en temps reel : showUsers est rappele a chaque nouveau visiteur, visite,
+  // quiz demarre ou termine (voir watchAllUsersWithData dans auth.js). loadUsers
+  // relance l'ecoute depuis zero, par exemple apres une suppression.
+  let stopWatchingUsers = null;
   function loadUsers() {
     document.getElementById('usersList').innerHTML = '<p class="acct-empty">Chargement…</p>';
-    getAllUsersWithData().then(function (users) {
-      users.forEach(function (u) { u.stats = computeStats(u.history, u.favorites); });
-      allUsers = users;
-      realUsers = allUsers.filter(function (u) { return !u.isTestSession; });
-      const namedUsers = realUsers.filter(function (u) { return !u.isAnonymous; });
-      renderInscrits(namedUsers);
-      renderLeaderboard(namedUsers);
-      renderPopularity(realUsers);
-      renderWeeklyVisitors(realUsers);
-      renderBadgeDistribution(namedUsers);
-      renderFailedAlerts(realUsers);
-      renderRecentActivity(realUsers);
-      renderMatrix(namedUsers);
-      applyFilters();
-      const expiredCount = expiredUsers().length;
-      document.getElementById('purgeExpiredBtn').textContent = '🗓️ Effacer les données expirées (RGPD)' + (expiredCount ? ' — ' + expiredCount + ' à effacer' : '');
-    }).catch(function () {
+    if (stopWatchingUsers) stopWatchingUsers();
+    stopWatchingUsers = watchAllUsersWithData(showUsers, function () {
       document.getElementById('usersList').innerHTML = '<p class="acct-empty">Erreur de chargement des données.</p>';
+      document.getElementById('liveStatus').textContent = '⚠️ Connexion en direct interrompue — appuyez sur F5 pour recharger la page.';
     });
+  }
+
+  function showUsers(users) {
+    users.forEach(function (u) { u.stats = computeStats(u.history, u.favorites); });
+    allUsers = users;
+    realUsers = allUsers.filter(function (u) { return !u.isTestSession; });
+    const namedUsers = realUsers.filter(function (u) { return !u.isAnonymous; });
+    renderInscrits(namedUsers);
+    renderLeaderboard(namedUsers);
+    renderPopularity(realUsers);
+    renderWeeklyVisitors(realUsers);
+    renderBadgeDistribution(namedUsers);
+    renderFailedAlerts(realUsers);
+    renderRecentActivity(realUsers);
+    renderMatrix(namedUsers);
+    applyFilters();
+    const expiredCount = expiredUsers().length;
+    document.getElementById('purgeExpiredBtn').textContent = '🗓️ Effacer les données expirées (RGPD)' + (expiredCount ? ' — ' + expiredCount + ' à effacer' : '');
+    document.getElementById('liveStatus').textContent = '🟢 En direct : les chiffres se mettent à jour tout seuls, sans recharger la page — dernière mise à jour à ' +
+      new Date().toLocaleTimeString('fr-FR') + '.';
   }
 
   function applyFilters() {

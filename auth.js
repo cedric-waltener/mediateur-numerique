@@ -9,7 +9,7 @@ import {
 import {
   getFirestore, doc, getDoc, setDoc, deleteDoc,
   arrayUnion, arrayRemove, collection, addDoc,
-  query, orderBy, getDocs, increment, deleteField
+  query, orderBy, getDocs, increment, deleteField, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -167,32 +167,88 @@ export async function deleteMyAccount(password) {
   await deleteUser(user);
 }
 
+function userFromDoc(uid, data, history) {
+  return {
+    uid: uid,
+    email: data.email || "",
+    username: data.username || "",
+    isAnonymous: !!data.isAnonymous || !data.email,
+    isTestSession: !!data.isTestSession,
+    firstSeen: data.firstSeen || null,
+    lastActiveDay: data.lastActiveDay || null,
+    quizStarts: data.quizStarts || {},
+    favorites: data.favorites || [],
+    history: history
+  };
+}
+
+function quizHistoryQuery(uid) {
+  return query(collection(db, "users", uid, "quizResults"), orderBy("date", "desc"));
+}
+
+function historyFromSnap(snap) {
+  return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+}
+
 export async function getAllUsersWithData() {
   const usersSnap = await getDocs(collection(db, "users"));
   const results = [];
   for (const userDoc of usersSnap.docs) {
-    const data = userDoc.data();
     if (userDoc.id === MODERATOR_UID) continue;
     let history = [];
-    try {
-      const q = query(collection(db, "users", userDoc.id, "quizResults"), orderBy("date", "desc"));
-      const historySnap = await getDocs(q);
-      history = historySnap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
-    } catch (e) {}
-    results.push({
-      uid: userDoc.id,
-      email: data.email || "",
-      username: data.username || "",
-      isAnonymous: !!data.isAnonymous || !data.email,
-      isTestSession: !!data.isTestSession,
-      firstSeen: data.firstSeen || null,
-      lastActiveDay: data.lastActiveDay || null,
-      quizStarts: data.quizStarts || {},
-      favorites: data.favorites || [],
-      history: history
-    });
+    try { history = historyFromSnap(await getDocs(quizHistoryQuery(userDoc.id))); } catch (e) {}
+    results.push(userFromDoc(userDoc.id, userDoc.data(), history));
   }
   return results;
+}
+
+// Tableau de bord en temps reel (moderateur) : rappelle cb(users) a chaque changement.
+// La collection users est ecoutee en direct (nouveaux visiteurs, visites, quiz demarres,
+// favoris). L'historique de quiz est lu une fois par visiteur, et ecoute en direct
+// seulement pour les visiteurs venus aujourd'hui (ceux qui peuvent etre en train de
+// passer un quiz), pour ne pas ouvrir une ecoute par visiteur de toute la base.
+// Renvoie une fonction qui arrete toutes les ecoutes.
+export function watchAllUsersWithData(cb, onError) {
+  const profiles = {}, histories = {}, liveHistories = {};
+  let ready = false, stopped = false;
+  function emit() {
+    if (!ready || stopped) return;
+    cb(Object.keys(profiles).map(function (uid) { return userFromDoc(uid, profiles[uid], histories[uid] || []); }));
+  }
+  function listenHistory(uid) {
+    if (liveHistories[uid]) return;
+    liveHistories[uid] = onSnapshot(quizHistoryQuery(uid), function (snap) {
+      histories[uid] = historyFromSnap(snap);
+      emit();
+    }, function () {});
+  }
+  const stopUsers = onSnapshot(collection(db, "users"), function (snap) {
+    const today = new Date().toISOString().slice(0, 10);
+    const loads = [];
+    snap.docChanges().forEach(function (change) {
+      const uid = change.doc.id;
+      if (uid === MODERATOR_UID) return;
+      if (change.type === "removed") {
+        delete profiles[uid];
+        delete histories[uid];
+        if (liveHistories[uid]) { liveHistories[uid](); delete liveHistories[uid]; }
+        return;
+      }
+      profiles[uid] = change.doc.data();
+      if (profiles[uid].lastActiveDay === today) {
+        listenHistory(uid);
+      } else if (!(uid in histories)) {
+        histories[uid] = [];
+        loads.push(getDocs(quizHistoryQuery(uid)).then(function (s) { histories[uid] = historyFromSnap(s); }).catch(function () {}));
+      }
+    });
+    Promise.all(loads).then(function () { ready = true; emit(); });
+  }, onError);
+  return function stop() {
+    stopped = true;
+    stopUsers();
+    Object.keys(liveHistories).forEach(function (uid) { liveHistories[uid](); });
+  };
 }
 
 function authErrorMessage(err) {
