@@ -86,7 +86,7 @@
             <li>Votre propre compte n'apparaît jamais dans ces stats ni dans cette liste.</li>
             <li>Les visiteurs anonymes sont masqués de cette liste par défaut (carte en pointillés quand affichés) — cochez <strong>"Inclure les visiteurs anonymes"</strong> pour les voir.</li>
             <li><strong>🔎 Rechercher</strong> : filtre la liste par nom ou e-mail en tapant.</li>
-            <li><strong>Trier par</strong> : nom, nombre de quiz, activité récente, dernière visite, meilleur score ou ateliers maîtrisés.</li>
+            <li><strong>Trier par</strong> : par défaut, les visiteurs venus le plus récemment sont en haut (dernière visite). Autres choix : première visite (les nouveaux arrivants en haut), nom, nombre de quiz, activité récente, meilleur score ou ateliers maîtrisés. Les visiteurs sans date connue sont en bas.</li>
             <li><strong>📥 Exporter en CSV</strong> : télécharge un fichier avec tous les visiteurs (nom, e-mail, quiz, favoris, meilleur score, dernière activité, première et dernière visite), à ouvrir dans Excel.</li>
             <li><strong>🔁 Réinitialiser le quiz</strong> : efface tout l'historique de quiz de ce visiteur (utile en cas de triche ou pour repartir de zéro).</li>
             <li><strong>🔑 Réinitialiser le mot de passe</strong> : envoie à ce visiteur un e-mail pour choisir un nouveau mot de passe.</li>
@@ -199,10 +199,11 @@
           <div class="reg-field" style="margin:0;">
             <label for="userSort">Trier par</label>
             <select id="userSort">
+              <option value="lastvisit" selected>Dernière visite (récente en haut)</option>
+              <option value="firstvisit">Première visite (récente en haut)</option>
               <option value="name">Nom (A → Z)</option>
               <option value="quizzes">Nombre de quiz</option>
               <option value="recent">Activité récente</option>
-              <option value="lastvisit">Dernière visite</option>
               <option value="bestscore">Meilleur score</option>
               <option value="mastered">Ateliers maîtrisés</option>
             </select>
@@ -599,6 +600,7 @@
       if (sortBy === 'quizzes') return b.history.length - a.history.length;
       if (sortBy === 'recent') return mostRecent(b.history) - mostRecent(a.history);
       if (sortBy === 'lastvisit') return (b.lastActiveDay || '').localeCompare(a.lastActiveDay || '') || (b.firstSeen || '').localeCompare(a.firstSeen || '');
+      if (sortBy === 'firstvisit') return (b.firstSeen || '').localeCompare(a.firstSeen || '');
       if (sortBy === 'bestscore') return bestPct(b.history) - bestPct(a.history);
       if (sortBy === 'mastered') return b.stats.masteredCount - a.stats.masteredCount;
       return (a.username || a.email).localeCompare(b.username || b.email, 'fr', { sensitivity: 'base' });
