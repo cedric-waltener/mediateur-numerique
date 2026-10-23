@@ -72,6 +72,7 @@
           <p><strong>Sur cette page (tableau de bord)</strong></p>
           <ul>
             <li>En haut : nombre total de comptes visiteurs, quiz passés, favoris posés, <strong>🕶️ visiteurs anonymes</strong> (personnes ayant utilisé le site sans créer de compte — suivies discrètement pour la visibilité, jamais nommées) et <strong>🧪 sessions de test</strong> (voir juste en dessous). Aucune localisation n'est collectée (supprimée pour le RGPD) : les anciennes villes enregistrées s'effacent d'elles-mêmes au retour de chaque visiteur.</li>
+            <li><strong>📈 Nouveaux visiteurs par semaine</strong> : combien de navigateurs sont venus pour la première fois sur le site chaque semaine (8 dernières semaines), et combien de visiteurs (nouveaux ou revenus, comptes inclus) sont passés ces 7 derniers jours — pratique pour voir l'effet d'un atelier, d'une affiche ou d'un article. Toutes les pages du site comptent la visite, sauf l'espace enfants (qui n'enregistre aucune donnée, comme annoncé dans les mentions légales).</li>
             <li><strong>🧪 Sessions de test</strong> : quand du developpement est fait sur le site, les pages sont parfois chargées avec <code>?internal_test=1</code> dans l'adresse — ces visites sont marquées automatiquement, exclues de toutes les statistiques ci-dessus (classement, popularité, badges, activité, KPI) et n'incrémentent pas le compteur de visites public. Elles restent visibles uniquement dans la liste "Comptes visiteurs" (cochez "Inclure les visiteurs anonymes"), clairement étiquetées "🧪 Session de test (Claude)" avec une bordure orange en pointillés — pour ne jamais les confondre avec un vrai visiteur. Le bouton <strong>"🧹 Supprimer les sessions de test"</strong> efface d'un coup tous ces comptes de test sans jamais toucher à un vrai visiteur.</li>
             <li><strong>🧹 Supprimer les visiteurs anonymes d'aujourd'hui</strong> : filet de sécurité pour les visites anonymes non marquées <code>?internal_test=1</code> (donc pas repérées par le bouton précédent) — par exemple si du développement a été fait sans ce paramètre. Supprime les comptes anonymes dont la premiere visite ou le dernier quiz date d'aujourd'hui. Les comptes anonymes trop anciens pour avoir une date connue (créés avant l'ajout de ce suivi) ne sont volontairement pas touchés, pour ne jamais risquer d'effacer un vrai visiteur par erreur.</li>
             <li><strong>👥 Inscrits</strong> : liste complète (pas seulement le top 10) de tous les comptes créés sur le site avec leur nom, par ordre alphabétique — visible ici uniquement, jamais sur les pages publiques.</li>
@@ -135,6 +136,12 @@
           <span class="kpi-value" id="statTotalTest">—</span>
           <span class="kpi-label">Sessions de test</span>
         </div>
+      </div>
+
+      <div class="card reveal" id="weeklyCard">
+        <h3>📈 Nouveaux visiteurs par semaine</h3>
+        <p class="acct-empty" style="margin-bottom:0.6rem;">Visiteurs anonymes venus pour la première fois sur le site, semaine par semaine (lundi → dimanche). Un même navigateur n'est compté qu'une fois, à sa première visite.</p>
+        <div id="weeklyList"><p class="acct-empty">Chargement…</p></div>
       </div>
 
       <div class="card reveal" id="alertsCard">
@@ -347,6 +354,51 @@
     });
   }
 
+  // Nouveaux visiteurs anonymes par semaine (lundi -> dimanche), d'apres leur date de
+  // premiere visite (firstSeen, enregistree par watchAuth dans auth.js), + visiteurs
+  // actifs ces 7 derniers jours d'apres lastActiveDay (nouveaux et revenus).
+  function renderWeeklyVisitors(users) {
+    const el = document.getElementById('weeklyList');
+    const WEEKS = 8;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    const weeks = [];
+    for (let i = 0; i < WEEKS; i++) {
+      const start = new Date(monday);
+      start.setDate(monday.getDate() - 7 * i);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 7);
+      weeks.push({ start: start, end: end, count: 0 });
+    }
+    let undated = 0;
+    users.forEach(function (u) {
+      if (!u.isAnonymous) return;
+      const t = u.firstSeen ? new Date(u.firstSeen) : null;
+      if (!t || isNaN(t)) { undated++; return; }
+      weeks.forEach(function (w) { if (t >= w.start && t < w.end) w.count++; });
+    });
+    const cutoff = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+    const active = users.filter(function (u) { return u.lastActiveDay && u.lastActiveDay >= cutoff; }).length;
+    const max = Math.max.apply(null, weeks.map(function (w) { return w.count; })) || 1;
+    el.innerHTML = '<p style="margin:0 0 0.4rem;"><strong>👣 ' + active + '</strong> visiteur(s) passé(s) ces 7 derniers jours (nouveaux et revenus, comptes inclus).</p>' +
+      weeks.map(function (w, i) {
+        const pct = Math.round((w.count / max) * 100);
+        const label = i === 0 ? 'Cette semaine' : (i === 1 ? 'Semaine dernière' : 'Semaine du ' + w.start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }));
+        return '<div class="stats-row"><div class="stats-icon">📅</div>' +
+          '<div class="stats-info">' + label +
+          '<div class="stats-barwrap"><div class="stats-bar" style="width:0%" data-pct="' + pct + '"></div></div></div>' +
+          '<div class="stats-count">' + w.count + '</div></div>';
+      }).join('') +
+      (undated ? '<p class="acct-empty" style="margin-top:0.4rem;">' + undated + ' visiteur(s) anonyme(s) plus ancien(s), sans date de première visite, ne sont pas comptés ici.</p>' : '');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.querySelectorAll('.stats-bar[data-pct]').forEach(function (bar) { bar.style.width = bar.getAttribute('data-pct') + '%'; });
+      });
+    });
+  }
+
   function renderBadgeDistribution(users) {
     const el = document.getElementById('badgeDistList');
     if (!users.length) { el.innerHTML = '<p class="acct-empty">Aucune donnée pour l\'instant.</p>'; return; }
@@ -515,6 +567,7 @@
       renderInscrits(namedUsers);
       renderLeaderboard(namedUsers);
       renderPopularity(realUsers);
+      renderWeeklyVisitors(realUsers);
       renderBadgeDistribution(namedUsers);
       renderFailedAlerts(realUsers);
       renderRecentActivity(realUsers);

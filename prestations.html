@@ -171,6 +171,11 @@
     );
   }
 </script>
+<script type="module">
+  // Compte la visite (visiteur anonyme), comme sur les autres pages du site : voir watchAuth dans auth.js.
+  import { watchAuth } from './auth.js';
+  watchAuth(function () {});
+</script>
 <script src="translate-loader.js"></script>
 </body>
 </html>
